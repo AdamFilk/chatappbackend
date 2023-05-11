@@ -4,7 +4,7 @@ const User = require('../models/User');
 const authUser = async function(req,res,next){
     try{
         const token = req.body.header('Authorization').replace('Bearer ','');
-        const decoded = jwt.decode(token,'jwtsecret');
+        const decoded = jwt.decode(token,process.env.JWT_SECRET);
         const user = await User.findOne({
             _id: decoded,
             'tokens.token':token
@@ -30,7 +30,7 @@ const authSocketUser = async function(socket,next){
     try{
         const token = socket.handshake.auth.token || socket.handshake.query.token;
         
-        const decoded = jwt.decode(token,'jwtsecret');
+        const decoded = jwt.decode(token,process.env.JWT_SECRET);
         const user = await User.findOne({
             _id: decoded,
             'tokens.token':token
