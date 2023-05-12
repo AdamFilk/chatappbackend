@@ -12,6 +12,7 @@ app.use(express.json());
 //api routes
 const userRouter = require("../routes/users");
 const interestRouter = require("../routes/interests");
+const friendRouter = require("../routes/friends");
 const authRouter = require("../routes/auth");
 
 
@@ -20,6 +21,7 @@ require("./db"); // mongodb connection
 //routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/friends",friendRouter);
 app.use("/api/v1/interests", interestRouter);
 
 

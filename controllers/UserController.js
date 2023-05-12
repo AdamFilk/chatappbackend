@@ -38,7 +38,7 @@ const getUsers = async (req,res) => {
 
 const showUser = async (req,res) => {
     try{
-        const user = await User.findOne({_id:req.params.id}).populate({
+        const user = await User.findOne({_id:req.user._id}).populate({
             path: 'interests',
             model:'Interest'
         }).exec();

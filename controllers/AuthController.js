@@ -4,7 +4,7 @@ const login = async (req,res) => {
     try{
         const {email,password} = req.body;
         if(!email || !password || email.trim() == "" || password.trim() == ""){
-            res.status(400).send({
+            return res.status(400).send({
                 result:0,
                 message: "Email and Password cannot be empty"
             });

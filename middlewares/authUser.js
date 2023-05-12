@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 const authUser = async function(req,res,next){
     try{
-        const token = req.body.header('Authorization').replace('Bearer ','');
+        const token = req.header('Authorization').replace('Bearer ','');
         const decoded = jwt.decode(token,process.env.JWT_SECRET);
         const user = await User.findOne({
             _id: decoded,
@@ -19,7 +19,8 @@ const authUser = async function(req,res,next){
         req.user = user;
         next();
     }catch(e){
-        res.status(401).send({
+        console.log(e.message);
+        return res.status(401).send({
             result:0,
             message:'Please Login'
         });
