@@ -20,7 +20,12 @@ const groupSchema = new Schema({
                 ref:'User'
             }
         }
-    ]
+    ],
+    is_private : {
+        type : Boolean,
+        required: true,
+        default : false
+    }
 },{timestamps:true})
 
 const Group = mongoose.model('Group',groupSchema);

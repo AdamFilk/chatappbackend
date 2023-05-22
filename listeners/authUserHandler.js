@@ -7,6 +7,7 @@ module.exports = (io,socket) => {
         try{
             const user = socket.user
             user.socket_id = socket.id;
+            user.is_active = true;
             user.save();
             socket.emit('message','Success!');
         }catch(err){
@@ -66,4 +67,13 @@ module.exports = (io,socket) => {
         }
     }
     socket.on('user:send-interest-message',sendInterestMessage);
+
+
+    //on disconnect
+    socket.on('disconnect', async () => {
+        const user = socket.user;
+        user.is_active = false;
+        await user.save();
+        // Perform any necessary actions upon disconnection
+      });
 }

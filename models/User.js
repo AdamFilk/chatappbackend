@@ -48,6 +48,10 @@ const UserSchema = new Schema({
     ],
     socket_id:{
         type: String,
+    },
+    is_active: {
+        type:Boolean,
+        default: false
     }
 },{timestamps:true});
 UserSchema.methods.toJSON = function(){

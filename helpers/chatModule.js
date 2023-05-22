@@ -40,7 +40,7 @@ const interestChat = async (interest) =>{
     }
     const interestedUsers = await User.find({
         interest: {
-            $in : [interest]
+            $in : interest
         }
     });
     for(let a=0; a < interestedUsers.length; a++){
