@@ -54,7 +54,7 @@ module.exports = (io,socket) => {
 
     const sendInterestMessage = async (payload) => {
         try{
-            const chat = await groupChat(payload.interest_id);
+            const chat = await interestChat(payload.interest_id);
             const message = await new Message({
                 content : payload.content,
                 type : payload.type,
