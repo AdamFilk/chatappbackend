@@ -5,11 +5,19 @@ const groupSchema = new Schema({
         type:String,
         required:true
     },
+    admins:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            required:true,
+            ref:'User'
+        }
+    ],
     members:[
         {
             user:{
                 type:mongoose.Schema.Types.ObjectId,
-                required:true
+                required:true,
+                ref:'User'
             }
         }
     ]
