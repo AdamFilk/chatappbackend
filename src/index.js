@@ -14,6 +14,7 @@ const userRouter = require("../routes/users");
 const interestRouter = require("../routes/interests");
 const friendRouter = require("../routes/friends");
 const authRouter = require("../routes/auth");
+const groupRouter = require('../routes/group');
 
 
 require("./db"); // mongodb connection
@@ -23,6 +24,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/friends",friendRouter);
 app.use("/api/v1/interests", interestRouter);
+app.use('/api/v1/groups',groupRouter);
 
 
 //socket stuff
