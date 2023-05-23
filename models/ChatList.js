@@ -9,7 +9,8 @@ const chatListSchema = new Schema({
         {
             chat:{
                 type: Schema.Types.ObjectId,
-                required:true
+                required:true,
+                ref:'Chat'
             }
         }
     ]
