@@ -1,6 +1,42 @@
 const { default: mongoose } = require("mongoose");
 const Group = require("../models/Group");
 
+const groupList = async (req,res) => {
+    try{
+        const groups = await Group.find({is_private:false}).sort({created_at: -1});
+        return res.status(200).send({
+            result:1,
+            data : groups
+        });
+    }catch(e){
+        return res.status(400).send({
+            result: 0,
+            message: e.message
+        });  
+    }
+}
+
+const getGroupInfo = async (req,res) => {
+    try{
+        const group = await Group.findOne({_id:req.body.group_id});
+        if(!group){
+            return res.status(200).send({
+                result:0,
+                message:'There is no such grouo with that ID'
+            });
+        }
+        return res.status(200).send({
+            result:1,
+            data : group
+        });
+    }catch(e){
+        res.status(400).send({
+            result:0,
+            message:e.message
+        })
+    }
+}
+
 const createGroup = async (req,res) => {
     try{
         const group = new Group({
@@ -12,8 +48,8 @@ const createGroup = async (req,res) => {
         await group.save();
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -25,13 +61,13 @@ const joinGroup = async (req,res) => {
         group.members = group.members.concat(user._id);
         await group.save();
         return res.status(200).send({
-            'result':1,
-            'message': 'Joined Group Successfully!'
+            result:1,
+            message: 'Joined Group Successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -47,21 +83,21 @@ const deleteGroup = async (req,res) => {
         });
         if(!is_admin){
             return res.status(400).send({
-                'result': 0,
-                'message': 'Sorry, you are not an admin'
+                result: 0,
+                message: 'Sorry, you are not an admin'
             });
         }
 
         await Group.deleteOne({_id:req.body.group_id});
 
         return res.status(200).send({
-            'result':1,
-            'message': 'Deleted Group Successfully!'
+            result:1,
+            message: 'Deleted Group Successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -77,21 +113,21 @@ const renameGroup = async (req,res)=> {
         });
         if(!is_admin){
             return res.status(400).send({
-                'result': 0,
-                'message': 'Sorry, you are not an admin'
+                result: 0,
+                message: 'Sorry, you are not an admin'
             });
         }
         const group = await Group.findOne({_id:req.body.group_id});
         group.name = req.body.name;
         await group.save();
         return res.status(200).send({
-            'result':1,
-            'message': 'Renamed Group Successfully!'
+            result:1,
+            message: 'Renamed Group Successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -107,21 +143,21 @@ const kickFromGroup = async (req,res) => {
         });
         if(!is_admin){
             return res.status(400).send({
-                'result': 0,
-                'message': 'Sorry, you are not an admin'
+                result: 0,
+                message: 'Sorry, you are not an admin'
             });
         }
         const group = await Group.findOne({_id:req.body.group_id});
         group.members = group.members.filter(gm => gm !== mongoose.Types.ObjectId(req.body.member_id));
         await group.save();
         return res.status(200).send({
-            'result':1,
-            'message': 'Kicked from Group Successfully!'
+            result:1,
+            message: 'Kicked from Group Successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -137,21 +173,21 @@ const togglePrivacy = async (req,res) => {
         });
         if(!is_admin){
             return res.status(400).send({
-                'result': 0,
-                'message': 'Sorry, you are not an admin'
+                result: 0,
+                message: 'Sorry, you are not an admin'
             });
         }
         const group = await Group.findOne({_id:req.body.group_id});
         group.is_private = req.body.is_private;
         await group.save();
         return res.status(200).send({
-            'result':1,
-            'message': 'Changed Group Privacy Successfully!'
+            result:1,
+            message: 'Changed Group Privacy Successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -167,21 +203,21 @@ const giveAdminRole = async (req,res) => {
         });
         if(!is_admin){
             return res.status(400).send({
-                'result': 0,
-                'message': 'Sorry, you are not an admin'
+                result: 0,
+                message: 'Sorry, you are not an admin'
             });
         }
         const group = await Group.findOne({_id:req.body.group_id});
         group.admins = group.admins.concat(req.body.member_id);
         await group.save();
         return res.status(200).send({
-            'result':1,
-            'message': 'Gave admin successfully!'
+            result:1,
+            message: 'Gave admin successfully!'
         });
     }catch(e){
         return res.status(400).send({
-            'result': 0,
-            'message': e.message
+            result: 0,
+            message: e.message
         });  
     }
 }
@@ -192,5 +228,8 @@ module.exports = {
     deleteGroup,
     renameGroup,
     kickFromGroup,
-    togglePrivacy
+    togglePrivacy,
+    giveAdminRole,
+    groupList,
+    getGroupInfo
 }
