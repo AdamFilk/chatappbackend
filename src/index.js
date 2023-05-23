@@ -15,6 +15,7 @@ const interestRouter = require("../routes/interests");
 const friendRouter = require("../routes/friends");
 const authRouter = require("../routes/auth");
 const groupRouter = require('../routes/group');
+const chatRouter = require('../routes/chat');
 
 
 require("./db"); // mongodb connection
@@ -25,7 +26,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/friends",friendRouter);
 app.use("/api/v1/interests", interestRouter);
 app.use('/api/v1/groups',groupRouter);
-
+app.use('/api/v1/chat',chatRouter);
 
 //socket stuff
 const socketIO = require('socket.io');
