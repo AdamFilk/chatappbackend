@@ -13,8 +13,8 @@ groupList,
 getGroupInfo
 } = require('../controllers/GroupController');
 
-router.get('/',groupList);
-router.get('/get-group-info',getGroupInfo);
+router.get('/',authUser,groupList);
+router.post('/get-group-info',authUser,getGroupInfo);
 router.post('/',authUser,createGroup);
 router.post('/join',authUser,joinGroup);
 router.post('/rename',authUser,renameGroup);

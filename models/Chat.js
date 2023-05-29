@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+
+const is_required_normal = function(){
+    if(!this.group_id && !this.interest){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 const chatSchema = new Schema({
     sender_id:{
         type: mongoose.Schema.Types.ObjectId,
@@ -21,13 +30,7 @@ const chatSchema = new Schema({
     }
 },{timestamps:true})
 
+
 const Chat = mongoose.model('Chat',chatSchema);
 
-const is_required_normal = function(){
-    if(!this.group_id && !this.interest){
-        return true;
-    }else{
-        return false;
-    }
-}
 module.exports = Chat;

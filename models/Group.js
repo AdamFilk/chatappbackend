@@ -14,11 +14,9 @@ const groupSchema = new Schema({
     ],
     members:[
         {
-            user:{
-                type:mongoose.Schema.Types.ObjectId,
-                required:true,
-                ref:'User'
-            }
+            type:mongoose.Schema.Types.ObjectId,
+            required:true,
+            ref:'User'
         }
     ],
     is_private : {
@@ -27,6 +25,26 @@ const groupSchema = new Schema({
         default : false
     }
 },{timestamps:true})
+
+//how to aggregate hide nested object 
+groupSchema.pre('aggregate',function(next){
+    const projectStage = {
+        $project: {
+            password: 0,
+            tokens:0,
+        }
+    };
+    const pipeline = this.pipeline();
+    pipeline.forEach(stage => {
+      if (stage.$lookup) {
+        const lookupStage = stage.$lookup;
+        if(lookupStage.from == 'users'){
+            lookupStage.pipeline.push(projectStage);
+        }
+      }
+    });
+    next();
+});
 
 const Group = mongoose.model('Group',groupSchema);
 module.exports = Group;

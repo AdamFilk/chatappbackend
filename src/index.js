@@ -32,11 +32,11 @@ app.use('/api/v1/chat',chatRouter);
 const socketIO = require('socket.io');
 const socketServer = http.createServer()
 const io = socketIO(socketServer);
-const joinHandler = require("../listeners/joinHandler");
+// const guestUserHandler = require('../listeners/guestUserHandler');
 const { authSocketUser } = require('../middlewares/authUser');
 const authUserHanlder = require('../listeners/authUserHandler');
 const onConnection = (socket) => {  
-  joinHandler(io, socket); //io from io  and socket from being on connection param
+  guestUserHandler(io, socket); //io from io  and socket from being on connection param
 };
 
 io.on("connection", onConnection);

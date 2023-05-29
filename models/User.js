@@ -93,6 +93,14 @@ UserSchema.pre('save',async function(next){
     next();
 });
 
+UserSchema.pre('aggregate',function(next){
+    this.pipeline().forEach(stage => {
+        stage.$project.tokens = 0;
+        stage.$project.password = 0;
+    });
+    next();
+});
+
 const User = mongoose.model("User",UserSchema);
 
 module.exports = User;

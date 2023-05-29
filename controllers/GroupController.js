@@ -3,7 +3,55 @@ const Group = require("../models/Group");
 
 const groupList = async (req,res) => {
     try{
-        const groups = await Group.find({is_private:false}).sort({created_at: -1});
+        const user = req.user;
+        const groups = await Group.aggregate([
+            {
+                $match :{
+                    $or:[
+                        {is_private:false},
+                        {is_private: true, members: {
+                            $elemMatch: {$eq: user._id}
+                        }}
+                    ]
+                }
+            },
+            {
+                $lookup : {
+                    from: 'users',
+                    localField:'members',
+                    foreignField:'_id',
+                    as: 'members',
+                    pipeline:[
+                        {
+                            $lookup :{
+                                from: 'interests',
+                                localField:'interests',
+                                foreignField:'_id',
+                                as: 'interests',
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup : {
+                    from: 'users',
+                    localField:'admins',
+                    foreignField:'_id',
+                    as: 'admins',
+                    pipeline:[
+                        {
+                            $lookup :{
+                                from: 'interests',
+                                localField:'interests',
+                                foreignField:'_id',
+                                as: 'interests',
+                            }
+                        }
+                    ]
+                }
+            },
+        ]).exec();
         return res.status(200).send({
             result:1,
             data : groups
@@ -18,7 +66,7 @@ const groupList = async (req,res) => {
 
 const getGroupInfo = async (req,res) => {
     try{
-        const group = await Group.findOne({_id:req.body.group_id});
+        const group = await Group.findOne({_id:req.body.group_id}).populate(['admins','members']).exec();
         if(!group){
             return res.status(200).send({
                 result:0,
@@ -42,10 +90,15 @@ const createGroup = async (req,res) => {
         const group = new Group({
             name : req.body.name,
             admins : [req.user._id],
-            members : [req.user._id],
+            members :  [req.user._id],
             is_private : req.body.is_private
         });
         await group.save();
+        return res.status(201).send({
+            result: 1,
+            message: 'Successfully created group',
+            data:group
+        });
     }catch(e){
         return res.status(400).send({
             result: 0,
@@ -148,13 +201,15 @@ const kickFromGroup = async (req,res) => {
             });
         }
         const group = await Group.findOne({_id:req.body.group_id});
-        group.members = group.members.filter(gm => gm !== mongoose.Types.ObjectId(req.body.member_id));
+        group.members = group.members.filter(gm => gm !== new mongoose.Types.ObjectId(req.body.member_id));
+        group.admins = group.admins.filter(ga => ga !== new mongoose.Types.ObjectId(req.body.member_id));
         await group.save();
         return res.status(200).send({
             result:1,
             message: 'Kicked from Group Successfully!'
         });
     }catch(e){
+        // console.log(e);
         return res.status(400).send({
             result: 0,
             message: e.message
