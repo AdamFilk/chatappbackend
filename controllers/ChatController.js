@@ -4,35 +4,36 @@ const Message = require("../models/Message");
 const getChatList = async (req,res) => {
     try{
         const user = req.user;
-        const userChatList = await ChatList.findOne({user_id:user._id});
-        if(!userChatList){
-            return res.status(200).send({
-                result: 1,
-                data: userChatList
-            });
-        }
         if(req.body.group_id){
-            await userChatList.populate({
-                path: 'chats',
+            const userChatList = await ChatList.findOne({user_id:user._id}).populate({
+                path: 'chatList',
                 model:'Chat',
                 match: {group_id: req.body.group_id}
-            }).execPopulate();
+            }).exec();
+            return res.status(200).send({
+                result:1,
+                data : userChatList 
+             });
         }else if(req.body.interest_id){
-            await userChatList.populate({
-                path: 'chats',
+            const userChatList = await ChatList.findOne({user_id:user._id}).populate({
+                path: 'chatList',
                 model:'Chat',
                 match: {interest: req.body.interest_id}
-            }).execPopulate();
+            }).exec();
+            return res.status(200).send({
+                result:1,
+                data : userChatList 
+             });
         }else{
-            await userChatList.populate({
-                path:'chats',
+            const userChatList = await ChatList.findOne({user_id:user._id}).populate({
+                path:'chatList',
                 model:'Chat',
-            }).execPopulate();
+            }).exec();
+            return res.status(200).send({
+                result:1,
+                data : userChatList 
+             });
         }
-        return res.status(200).send({
-            result:1,
-            data : userChatList 
-         });
     }catch(e){
         console.log(e);
         return res.status(400).send({

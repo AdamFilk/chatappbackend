@@ -21,6 +21,9 @@ module.exports = (io,socket) => {
     const sendMessage =  async (payload) => {
         try{
             // console.log(payload.reciever_id);
+            if(!payload || !payload.content || !payload.type || !payload.reciever_id){
+                return console.log('Provid all payload please');
+            }
             const user = socket.user;
             const sender_id = user._id;
             const reciever_id = payload.reciever_id;
@@ -49,6 +52,9 @@ module.exports = (io,socket) => {
 
     const sendGroupMessage = async (payload) => {
         try{
+            if(!payload || !payload.content || !payload.type || !payload.group_id){
+                return console.log('Provid all payload please');
+            }
             const chat = await groupChat(payload.group_id);
             const message = await new Message({
                 content : payload.content,
@@ -64,6 +70,9 @@ module.exports = (io,socket) => {
 
     const sendInterestMessage = async (payload) => {
         try{
+            if(!payload || !payload.content || !payload.type || !payload.interest_id){
+                return console.log('Provid all payload please');
+            }
             const chat = await interestChat(payload.interest_id);
             const message = await new Message({
                 content : payload.content,

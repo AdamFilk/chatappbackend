@@ -1,6 +1,7 @@
 const Chat = require("../models/Chat");
 const ChatList = require("../models/ChatList");
 const Group = require("../models/Group");
+const User = require("../models/User");
 
 const normalChat = async (sender_id,reciever_id) => {
     const chat = await Chat.findOne({
@@ -25,10 +26,16 @@ const normalChat = async (sender_id,reciever_id) => {
 const groupChat = async (group_id) => {
     const chat = await Chat.findOne({group_id});
     if(!chat){
-        chat = new Chat({group_id});
-        await chat.save();
+        const new_chat = new Chat({group_id});
+        await new_chat.save();
+        const group = await Group.findOne({_id:group_id});
+        const groupMems = group.members;
+        for(let a=0; a < groupMems.length; a++){
+            await chatListAction(groupMems[a],new_chat._id);
+        }
+        return new_chat;
     }
-    const group = await Group.findOne({group_id});
+    const group = await Group.findOne({_id:group_id});
     const groupMems = group.members;
     for(let a=0; a < groupMems.length; a++){
         await chatListAction(groupMems[a],chat._id);
@@ -39,18 +46,28 @@ const groupChat = async (group_id) => {
 const interestChat = async (interest) =>{
     const chat = await Chat.findOne({interest});
     if(!chat){
-        chat = new Chat({interest});
-        await chat.save();
-    }
-    const interestedUsers = await User.find({
-        interest: {
-            $in : interest
+        const new_chat = new Chat({interest});
+        await new_chat.save();
+        const interestedUsers = await User.find({
+            interest: {
+                $in : interest
+            }
+        });
+        for(let a=0; a < interestedUsers.length; a++){
+            await chatListAction(interestedUsers[a],new_chat._id);
         }
-    });
-    for(let a=0; a < interestedUsers.length; a++){
-        await chatListAction(interestedUsers[a],chat._id);
+        return new_chat;
+    }else{
+        const interestedUsers = await User.find({
+            interest: {
+                $in : interest
+            }
+        });
+        for(let a=0; a < interestedUsers.length; a++){
+            await chatListAction(interestedUsers[a],chat._id);
+        }
+        return chat;
     }
-    return chat;
 }
 
 const chatListAction = async (user_id,chat_id) => {
