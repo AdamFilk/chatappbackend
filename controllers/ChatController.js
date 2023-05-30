@@ -22,7 +22,7 @@ const getChatList = async (req,res) => {
                                 from: 'users',
                                 localField:'sender_id',
                                 foreignField:'_id',
-                                as: 'sender',
+                                as: 'senders',
                             }
                         },
                         {
@@ -30,7 +30,7 @@ const getChatList = async (req,res) => {
                                 from: 'users',
                                 localField:'reciever_id',
                                 foreignField:'_id',
-                                as: 'reciever',
+                                as: 'recievers',
                             }
                         },
                         {
@@ -38,7 +38,7 @@ const getChatList = async (req,res) => {
                                 from: 'groups',
                                 localField:'group_id',
                                 foreignField:'_id',
-                                as: 'group',
+                                as: 'groups',
                             }
                         },
                         {
@@ -46,13 +46,36 @@ const getChatList = async (req,res) => {
                                 from: 'interests',
                                 localField:'interest',
                                 foreignField:'_id',
-                                as: 'interest',
+                                as: 'interests',
                             }
                         },
+                        {
+                            $addFields:{
+                                intrest:{$arrayElemAt:['$interests',-1]},
+                                group:{$arrayElemAt:['$groups',-1]},
+                                sender:{$arrayElemAt:['$senders',-1]},
+                                reciever:{$arrayElemAt:['$recievers',-1]},
+                            }
+                        },
+                        {
+                            $project:{
+                                interests:0,
+                                senders:0,
+                                recievers:0,
+                                groups:0,
+                                sender_id:0,
+                                reciever_id:0,
+                                interest:0,
+                                group_id:0,
+                                'sender.tokens':0,
+                                'sender.password':0,
+                                'reciever.tokens':0,
+                                'reciever.password':0
+                            }
+                        }
                     ]
                 }
             },
-            // {$unwind: '$interest'},
             {
                 $project :{
                     user_id:0

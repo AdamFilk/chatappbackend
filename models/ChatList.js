@@ -30,13 +30,6 @@ chatListSchema.pre('aggregate',function(next){
         if(lookupStage.from == 'users'){
             lookupStage.pipeline = [projectStage];
         }
-        if(lookupStage.from == 'chats'){
-            lookupStage.pipeline.forEach(ls => {
-                if(ls.$lookup.from == 'users'){
-                    ls.$lookup.pipeline = [projectStage]
-                }
-            })
-        }
       }
     });
     next();
