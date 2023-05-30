@@ -32,6 +32,7 @@ groupSchema.pre('aggregate',function(next){
         $project: {
             password: 0,
             tokens:0,
+            socket_id:0
         }
     };
     const pipeline = this.pipeline();

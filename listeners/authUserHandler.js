@@ -61,7 +61,8 @@ module.exports = (io,socket) => {
                 type : payload.type,
                 chat_id : chat._id
             });
-            io.broadcast.to(payload.group_id).emit('message',message);
+            message.save();
+            socket.broadcast.to(payload.group_id).emit('message',message);
         }catch(e){
             console.log('Socket Err sendGroupMessage: '+e)
         }
@@ -79,7 +80,8 @@ module.exports = (io,socket) => {
                 type : payload.type,
                 chat_id : chat._id
             });
-            io.broadcast.to(payload.interest_id).emit('message',message);
+            message.save();
+            socket.broadcast.to(payload.interest_id).emit('message',message);
         }catch(e){
             console.log('Socket Err sendInterestMessage: '+e)
         }

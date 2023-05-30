@@ -38,11 +38,11 @@ const getUsers = async (req,res) => {
 
 const showUser = async (req,res) => {
     try{
-        const user = await User.findOne({_id:req.user._id}).populate({
+        const users = await User.findOne({_id:req.user._id}).populate({
             path: 'interests',
             model:'Interest'
         }).exec();
-        if(!user){
+        if(!users){
             res.status(404).send({
                 result:0,
                 message:'Sorry user not found'
@@ -50,7 +50,7 @@ const showUser = async (req,res) => {
         }
         res.status(200).send({
             result: 1,
-            data: user
+            data: users
         });
     }catch(e){
         res.status(400).send(e);

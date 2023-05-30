@@ -49,8 +49,8 @@ const interestChat = async (interest) =>{
         const new_chat = new Chat({interest});
         await new_chat.save();
         const interestedUsers = await User.find({
-            interest: {
-                $in : interest
+            interests: {
+                $in : [interest]
             }
         });
         for(let a=0; a < interestedUsers.length; a++){
@@ -59,8 +59,8 @@ const interestChat = async (interest) =>{
         return new_chat;
     }else{
         const interestedUsers = await User.find({
-            interest: {
-                $in : interest
+            interests: {
+                $in : [interest]
             }
         });
         for(let a=0; a < interestedUsers.length; a++){
