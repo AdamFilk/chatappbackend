@@ -3,15 +3,14 @@ const Schema = mongoose.Schema;
 const chatListSchema = new Schema({
     user_id:{
         type: Schema.Types.ObjectId,
-        required:true
+        required:true,
+        ref:'User'
     },
     chatList:[
         {
-            chat:{
-                type: Schema.Types.ObjectId,
-                required:true,
-                ref:'Chat'
-            }
+            type: Schema.Types.ObjectId,
+            required:true,
+            ref:'Chat'
         }
     ]
 },{timestamps:true});

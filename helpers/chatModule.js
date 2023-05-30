@@ -8,13 +8,17 @@ const normalChat = async (sender_id,reciever_id) => {
         reciever_id
     });
     if(!chat){
-        chat = new Chat({
+        const new_chat = new Chat({
             sender_id,
             reciever_id
         })
-        await chat.save();
+        await new_chat.save();
+        await chatListAction(sender_id,new_chat._id);
+        await chatListAction(reciever_id,new_chat._id);
+        return new_chat;
     }
     await chatListAction(sender_id,chat._id);
+    await chatListAction(reciever_id,chat._id);
     return chat;
 }
 
@@ -49,18 +53,18 @@ const interestChat = async (interest) =>{
     return chat;
 }
 
-const chatListAction = async (sender_id,chat_id) => {
-    const chatList = await ChatList.findOne({user_id:sender_id});
+const chatListAction = async (user_id,chat_id) => {
+    const chatList = await ChatList.findOne({user_id:user_id});
     if(!chatList){
-        chatList = new ChatList({user_id:sender_id,chatList:[chat_id]});
-        await chatList.save();
+        const new_chatList = new ChatList({user_id:user_id,chatList:[chat_id]});
+        await new_chatList.save();
     }else{
         const chat_exists = chatList.chatList.filter(c => c === chat_id).length > 0;
         if(!chat_exists){
             chatList.chatList = chatList.chatList.concat(chat_id);
             await chatList.save();
         }else{
-            await chatList.updateOne({_user_id:sender_id},{
+            await chatList.updateOne({_user_id:user_id},{
                 $currentDate: {
                     updated_at: true, // Update the 'updated_at' field to the current date and time
                   },

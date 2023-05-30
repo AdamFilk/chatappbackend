@@ -3,34 +3,43 @@ const Message = require('../models/Message');
 const {normalChat,groupChat,interestChat} = require('../helpers/chatModule');
 
 module.exports = (io,socket) => {
-    const addUserSocketID = () => {
-        try{
-            const user = socket.user
-            user.socket_id = socket.id;
-            user.is_active = true;
-            user.save();
-            socket.emit('message','Success!');
-        }catch(err){
-            console.log('Socket Err addUserSocketID:',err)
-        }
-    } 
+    // const addUserSocketID = () => {
+    try{
+        const user = socket.user;
+        // console.log(user);
+        user.socket_id = socket.id;
+        user.is_active = true;
+        user.save();
+        socket.emit('message','Success!');
+    }catch(err){
+        console.log('Socket Err addUserSocketID:',err);
+    }
+    // } 
 
-    socket.on('user:update-socketid',addUserSocketID);
+    // socket.on('user:update-socketid',addUserSocketID);
 
     const sendMessage =  async (payload) => {
         try{
+            // console.log(payload.reciever_id);
             const user = socket.user;
             const sender_id = user._id;
             const reciever_id = payload.reciever_id;
             const reciever = await User.findOne({_id:reciever_id});
-            const reciever_socket_id = reciever.socket_id;
-            const chat = await normalChat(sender_id,reciever_id);
-            const message = await new Message({
-                content : payload.content,
-                type : payload.type,
-                chat_id : chat._id
-            });
-            io.to(reciever_socket_id).emit('message',message);
+            if(reciever){
+                const reciever_socket_id = reciever.socket_id;
+                const chat = await normalChat(sender_id,reciever_id);
+                const message = await new Message({
+                    content : payload.content,
+                    type : payload.type,
+                    chat_id : chat._id
+                });
+                message.save();
+                if(reciever_socket_id){
+                    io.to(reciever_socket_id).emit('message',message);
+                }
+            }else{
+                sendErrMessage(user.socket_id,"Something went wrong");
+            }
         }catch(e){
             console.log('Socket Err sendMessage: '+e);
         }
@@ -68,6 +77,9 @@ module.exports = (io,socket) => {
     }
     socket.on('user:send-interest-message',sendInterestMessage);
 
+    const sendErrMessage = (socket_id,message) => {
+        io.to(socket_id).emit(message);
+    }
 
     //on disconnect
     socket.on('disconnect', async () => {

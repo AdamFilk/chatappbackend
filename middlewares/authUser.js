@@ -29,9 +29,11 @@ const authUser = async function(req,res,next){
 
 const authSocketUser = async function(socket,next){
     try{
-        const token = socket.handshake.auth.token || socket.handshake.query.token;
-        
+        // console.log(socket.handshake);
+        const bearerToken = socket.handshake.auth.token || socket.handshake.query.token;
+        const token = bearerToken.replace('Bearer ','');
         const decoded = jwt.decode(token,process.env.JWT_SECRET);
+        // console.log(decoded);
         const user = await User.findOne({
             _id: decoded,
             'tokens.token':token
