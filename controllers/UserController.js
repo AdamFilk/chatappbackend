@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const User = require('../models/User')
 
 const createUser = async (req,res) => {
@@ -59,16 +60,15 @@ const showUser = async (req,res) => {
 
 const updateUser = async (req,res) => {
     try{
-        const _id = req.params.id;
         const updates = Object.keys(req.body);
-        const allowedUpdateds = ["description", "completed"];
+        const allowedUpdateds = ["name", "email"];
         const isValidUpdates = updates.every((update) => 
           allowedUpdateds.includes(update)
         );
         if (!isValidUpdates) {
           return res.status(400).send({ error: "Invalid Update Keys" });
         }
-        const user = await User.findOne({_id});
+        const user = req.user;
         if(!user){
             res.status(404).send({
                 result:0,
@@ -91,21 +91,58 @@ const updateUser = async (req,res) => {
 
 const deleteUser = async (req,res) => {
     try{
-        const user = await User.findOneAndDelete({
-            _id : req.params.id
-        });
-        if (!user) {
-            return res.status(404).send({
-                result: 0,
-                message: 'Sorry user not found.'
-            });
-        }
+        const user = req.user;
+        // console.log(user);
+        await User.deleteOne({_id:user._id});
         res.status(200).send({
             result: 1,
             message: 'Deleted'
         });
     }catch(e){
-        res.status(400).send(e);
+        return res.status(400).send({
+            result:0,
+            message : e.message
+        });
+    }
+}
+
+const userInterestManage = async (req,res) => {
+    try{
+        const user = req.user;
+        const addInterest = req.body.add_interests;
+        const removeInterest = req.body.remove_interests;
+        if(addInterest.length > 0){
+            if(user.interests.length > 0){
+                user.interests = user.interests.concat(addInterest);
+            }else{
+                user.interests = addInterest;
+            }
+        }
+        if(removeInterest.length > 0){
+            if(user.interests.length > 0){
+                // removeInterest.forEach(rmi => {
+                //     user.interests = user.interests.filter(i => {
+                //         console.log(i,new mongoose.Types.ObjectId(rmi))
+                //         return i !==  new mongoose.Types.ObjectId(rmi)
+                //     });
+                // })
+                user.interests = user.interests.filter(interest => {
+                    return !removeInterest.includes(interest.toString())
+                });
+            }else{
+                console.log(`Ain't nothing to remove bro.`)
+            }
+        }
+        await user.save();
+        return res.status(200).send({
+            result:1,
+            data : user
+        });
+    }catch(e){
+        return res.status(400).send({
+            result:0,
+            message : e.message
+        })
     }
 }
 
@@ -114,5 +151,6 @@ module.exports = {
     getUsers,
     showUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    userInterestManage
 }

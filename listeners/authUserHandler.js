@@ -6,11 +6,9 @@ module.exports = (io,socket) => {
     // const addUserSocketID = () => {
     try{
         const user = socket.user;
-        // console.log(user);
         user.socket_id = socket.id;
         user.is_active = true;
         user.save();
-        socket.emit('message','Success!');
     }catch(err){
         console.log('Socket Err addUserSocketID:',err);
     }
@@ -38,7 +36,8 @@ module.exports = (io,socket) => {
                 });
                 message.save();
                 if(reciever_socket_id){
-                    io.to(reciever_socket_id).emit('message',message);
+                    // console.log(reciever_socket_id);
+                    io.of('/users').to(reciever_socket_id).emit('user:message',message);
                 }
             }else{
                 sendErrMessage(user.socket_id,"Something went wrong");
@@ -62,7 +61,7 @@ module.exports = (io,socket) => {
                 chat_id : chat._id
             });
             message.save();
-            socket.broadcast.to(payload.group_id).emit('message',message);
+            socket.to(payload.group_id).emit('message',message);
         }catch(e){
             console.log('Socket Err sendGroupMessage: '+e)
         }
@@ -81,7 +80,7 @@ module.exports = (io,socket) => {
                 chat_id : chat._id
             });
             message.save();
-            socket.broadcast.to(payload.interest_id).emit('message',message);
+            socket.to(payload.interest_id).emit('message',message);
         }catch(e){
             console.log('Socket Err sendInterestMessage: '+e)
         }

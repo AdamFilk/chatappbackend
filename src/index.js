@@ -36,7 +36,7 @@ const io = socketIO(socketServer);
 const { authSocketUser } = require('../middlewares/authUser');
 const authUserHanlder = require('../listeners/authUserHandler');
 const onConnection = (socket) => {  
-  guestUserHandler(io, socket); //io from io  and socket from being on connection param
+  // guestUserHandler(io, socket); //io from io  and socket from being on connection param
 };
 
 io.on("connection", onConnection);

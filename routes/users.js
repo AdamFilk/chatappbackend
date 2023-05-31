@@ -6,15 +6,18 @@ const {
     createUser,
     updateUser,
     showUser,
-    deleteUser
+    deleteUser,
+    userInterestManage
 } = require('../controllers/UserController');
 
 router.route('/')
       .get(getUsers)
       .post(createUser)
-router.route('/:id')
+router.route('/actions')
       .get(authUser,showUser)
-      .patch(updateUser)
-      .delete(deleteUser)
+      .patch(authUser,updateUser)
+      .delete(authUser,deleteUser)
+router.route('/user-interest-manage')
+      .post(authUser,userInterestManage)
 
 module.exports = router;

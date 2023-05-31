@@ -15,7 +15,9 @@ const normalChat = async (sender_id,reciever_id) => {
         })
         await new_chat.save();
         await chatListAction(sender_id,new_chat._id);
-        await chatListAction(reciever_id,new_chat._id);
+        if(sender_id !== reciever_id){
+            await chatListAction(reciever_id,new_chat._id);
+        }
         return new_chat;
     }
     await chatListAction(sender_id,chat._id);
@@ -76,7 +78,10 @@ const chatListAction = async (user_id,chat_id) => {
         const new_chatList = new ChatList({user_id:user_id,chatList:[chat_id]});
         await new_chatList.save();
     }else{
-        const chat_exists = chatList.chatList.filter(c => c === chat_id).length > 0;
+        const chat_exists = chatList.chatList.filter(c => {
+            // console.log(chat_id,c)
+            return chat_id.toString() == c.toString();
+        }).length > 0;
         if(!chat_exists){
             chatList.chatList = chatList.chatList.concat(chat_id);
             await chatList.save();
